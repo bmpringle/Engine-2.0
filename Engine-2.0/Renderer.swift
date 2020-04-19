@@ -18,60 +18,61 @@ class Renderer: NSObject, MTKViewDelegate {
     var eye = Eye(pos: SIMD3<Float>(0, 0, 0))
     var constants: Constants!
     var depthStencilState: MTLDepthStencilState!
+    var polygonsToRender = [[Vertex]]()
     
-    var verts = [
+    static var verts = [
         
-        float8(pos: SIMD4<Float>(-1, -1, -1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
-        float8(pos: SIMD4<Float>(-1, -1, 1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
-        float8(pos: SIMD4<Float>(-1, 1, 1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
+        Vertex(pos: SIMD4<Float>(-1, -1, -1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
+        Vertex(pos: SIMD4<Float>(-1, -1, 1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
+        Vertex(pos: SIMD4<Float>(-1, 1, 1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
         
-        float8(pos: SIMD4<Float>(-1, -1, -1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
-        float8(pos: SIMD4<Float>(-1, 1, -1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
-        float8(pos: SIMD4<Float>(-1, 1, 1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
-        
-        
-        float8(pos: SIMD4<Float>(1, -1, -1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
-        float8(pos: SIMD4<Float>(1, -1, 1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
-        float8(pos: SIMD4<Float>(1, 1, 1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
-        
-        float8(pos: SIMD4<Float>(1, -1, -1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
-        float8(pos: SIMD4<Float>(1, 1, -1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
-        float8(pos: SIMD4<Float>(1, 1, 1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
+        Vertex(pos: SIMD4<Float>(-1, -1, -1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
+        Vertex(pos: SIMD4<Float>(-1, 1, -1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
+        Vertex(pos: SIMD4<Float>(-1, 1, 1, 1), color: SIMD4<Float>(1, 1, 0, 1)),
         
         
-        float8(pos: SIMD4<Float>(-1, -1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
-        float8(pos: SIMD4<Float>(1, -1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
-        float8(pos: SIMD4<Float>(-1, 1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
+        Vertex(pos: SIMD4<Float>(1, -1, -1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
+        Vertex(pos: SIMD4<Float>(1, -1, 1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
+        Vertex(pos: SIMD4<Float>(1, 1, 1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
         
-        float8(pos: SIMD4<Float>(1, -1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
-        float8(pos: SIMD4<Float>(-1, 1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
-        float8(pos: SIMD4<Float>(1, 1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
-        
-        
-        float8(pos: SIMD4<Float>(-1, 1, -1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
-        float8(pos: SIMD4<Float>(1, 1, -1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
-        float8(pos: SIMD4<Float>(1, 1, 1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
-        
-        float8(pos: SIMD4<Float>(-1, 1, -1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
-        float8(pos: SIMD4<Float>(-1, 1, 1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
-        float8(pos: SIMD4<Float>(1, 1, 1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
+        Vertex(pos: SIMD4<Float>(1, -1, -1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
+        Vertex(pos: SIMD4<Float>(1, 1, -1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
+        Vertex(pos: SIMD4<Float>(1, 1, 1, 1), color: SIMD4<Float>(0, 1, 0, 1)),
         
         
-        float8(pos: SIMD4<Float>(-1, -1, -1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
-        float8(pos: SIMD4<Float>(1, -1, -1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
-        float8(pos: SIMD4<Float>(1, -1, 1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
+        Vertex(pos: SIMD4<Float>(-1, -1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
+        Vertex(pos: SIMD4<Float>(1, -1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
+        Vertex(pos: SIMD4<Float>(-1, 1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
         
-        float8(pos: SIMD4<Float>(-1, -1, -1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
-        float8(pos: SIMD4<Float>(-1, -1, 1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
-        float8(pos: SIMD4<Float>(1, -1, 1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
+        Vertex(pos: SIMD4<Float>(1, -1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
+        Vertex(pos: SIMD4<Float>(-1, 1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
+        Vertex(pos: SIMD4<Float>(1, 1, 1, 1), color: SIMD4<Float>(0, 1, 1, 1)),
+        
+        
+        Vertex(pos: SIMD4<Float>(-1, 1, -1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
+        Vertex(pos: SIMD4<Float>(1, 1, -1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
+        Vertex(pos: SIMD4<Float>(1, 1, 1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
+        
+        Vertex(pos: SIMD4<Float>(-1, 1, -1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
+        Vertex(pos: SIMD4<Float>(-1, 1, 1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
+        Vertex(pos: SIMD4<Float>(1, 1, 1, 1), color: SIMD4<Float>(1, 0, 1, 1)),
+        
+        
+        Vertex(pos: SIMD4<Float>(-1, -1, -1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
+        Vertex(pos: SIMD4<Float>(1, -1, -1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
+        Vertex(pos: SIMD4<Float>(1, -1, 1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
+        
+        Vertex(pos: SIMD4<Float>(-1, -1, -1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
+        Vertex(pos: SIMD4<Float>(-1, -1, 1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
+        Vertex(pos: SIMD4<Float>(1, -1, 1, 1), color: SIMD4<Float>(1, 1, 1, 1)),
       
-        float8(pos: SIMD4<Float>(-1, -1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
-        float8(pos: SIMD4<Float>(1, -1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
-        float8(pos: SIMD4<Float>(-1, 1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
+        Vertex(pos: SIMD4<Float>(-1, -1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
+        Vertex(pos: SIMD4<Float>(1, -1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
+        Vertex(pos: SIMD4<Float>(-1, 1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
         
-        float8(pos: SIMD4<Float>(1, -1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
-        float8(pos: SIMD4<Float>(-1, 1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
-        float8(pos: SIMD4<Float>(1, 1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
+        Vertex(pos: SIMD4<Float>(1, -1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
+        Vertex(pos: SIMD4<Float>(-1, 1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
+        Vertex(pos: SIMD4<Float>(1, 1, -1, 1), color: SIMD4<Float>(1, 0, 0, 1)),
         
     ]
     
@@ -79,7 +80,7 @@ class Renderer: NSObject, MTKViewDelegate {
         super.init()
         self.mtkView = mtkView
         device = mtkView.device!
-        constants = Constants(bounds: SIMD3<Float>(10, 10, 20), aspectRatio: SIMD2<Float>(Float(mtkView.bounds.width), Float(mtkView.bounds.height)))
+        constants = Constants(bounds: SIMD3<Float>(100, 100, 100), aspectRatio: SIMD2<Float>(Float(mtkView.bounds.width), Float(mtkView.bounds.height)))
         renderPipelineState = createRenderPipelineState()
         commandQueue = device.makeCommandQueue()!
         depthStencilState = buildDepthStencilState(device: device)
@@ -116,39 +117,44 @@ class Renderer: NSObject, MTKViewDelegate {
     }
     
     func draw(in view: MTKView) {
-        let cBuf = commandQueue.makeCommandBuffer()!
-        let encoder = cBuf.makeRenderCommandEncoder(descriptor: view.currentRenderPassDescriptor!)!
+        let commandBuffer = commandQueue.makeCommandBuffer()!
+        let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: view.currentRenderPassDescriptor!)!
         
-        let mtlBufferVertex = device.makeBuffer(bytes: verts, length: MemoryLayout<float8>.stride*verts.count, options: [])!
         let mtlConstantsBuffer = device.makeBuffer(length: 32, options: [])!
         let mtlEyeBuffer = device.makeBuffer(length: MemoryLayout<Eye>.size, options: [])!
         
-        memcpy(mtlConstantsBuffer.contents(), &constants, MemoryLayout<Constants>.size)
-        memcpy(mtlEyeBuffer.contents(), &eye, MemoryLayout<Eye>.size)
-        
-        encoder.setRenderPipelineState(renderPipelineState)
-        encoder.setDepthStencilState(depthStencilState)
-        encoder.setVertexBuffer(mtlBufferVertex, offset: 0, index: 0)
-        encoder.setVertexBuffer(mtlConstantsBuffer, offset: 0, index: 1)
-        encoder.setVertexBuffer(mtlEyeBuffer, offset: 0, index: 2)
-        encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: verts.count)
-        encoder.endEncoding()
-        cBuf.present(view.currentDrawable!)
-        cBuf.commit()
-    }
-    
-    @objc func test() {
-        verts = rotate90(a: verts)
-    }
-    
-    func rotate90(a: [float8]) -> [float8] {
-        var n = [float8]()
-        for i in a {
-            var n_1: float8 = float8(pos: SIMD4<Float>(0, 0, 0, 0), color: SIMD4<Float>(0, 0, 0, 0))
-            n_1.pos = SIMD4<Float>(-i.pos[2], i.pos[1], i.pos[0], i.pos[3])
-            n_1.color = i.color
-            n.append(n_1)
+        for i in polygonsToRender {
+            let mtlBufferVertex = device.makeBuffer(bytes: i, length: MemoryLayout<Vertex>.stride*i.count, options: [])!
+            memcpy(mtlConstantsBuffer.contents(), &constants, MemoryLayout<Constants>.size)
+            memcpy(mtlEyeBuffer.contents(), &eye, MemoryLayout<Eye>.size)
+            
+            commandEncoder.setRenderPipelineState(renderPipelineState)
+            commandEncoder.setDepthStencilState(depthStencilState)
+            commandEncoder.setVertexBuffer(mtlBufferVertex, offset: 0, index: 0)
+            commandEncoder.setVertexBuffer(mtlConstantsBuffer, offset: 0, index: 1)
+            commandEncoder.setVertexBuffer(mtlEyeBuffer, offset: 0, index: 2)
+            commandEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: i.count)
         }
-        return n
+        
+        commandEncoder.endEncoding()
+        commandBuffer.present(view.currentDrawable!)
+        commandBuffer.commit()
+    }
+    
+    static func rotate90(a: [Vertex]) -> [Vertex] {
+        var vArray = [Vertex]()
+        for i in a {
+            var v: Vertex = Vertex(pos: SIMD4<Float>(0, 0, 0, 0), color: SIMD4<Float>(0, 0, 0, 0))
+            v.pos = SIMD4<Float>(-i.pos[2], i.pos[1], i.pos[0], i.pos[3])
+            v.color = i.color
+            vArray.append(v)
+        }
+        return vArray
+    }
+    
+    func addOneToVertex() {
+        for i in 0..<Renderer.verts.count {
+            Renderer.verts[i].pos = SIMD4<Float>(Renderer.verts[i].pos[0]+1, Renderer.verts[i].pos[1]+1, Renderer.verts[i].pos[2]+1, Renderer.verts[i].pos[3])
+        }
     }
 }

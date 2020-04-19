@@ -32,7 +32,6 @@ class ViewController: NSViewController {
         
         mtkView.delegate = renderer
         
-        Timer.scheduledTimer(timeInterval: 2, target: renderer!, selector: #selector(renderer.test), userInfo: nil, repeats: true)
         Timer.scheduledTimer(timeInterval: 1/60, target: self, selector: #selector(passLogic), userInfo: nil, repeats: true)
         
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) {
@@ -54,6 +53,9 @@ class ViewController: NSViewController {
                 
                 case UInt16(kVK_Space):
                     self.logic.spaceDown = true
+                
+                case UInt16(kVK_UpArrow):
+                    self.logic.up = true
                 
                 default:
                     print($0.keyCode)
@@ -82,6 +84,9 @@ class ViewController: NSViewController {
                 case UInt16(kVK_Space):
                     self.logic.spaceDown = false
                 
+                case UInt16(kVK_UpArrow):
+                    self.logic.up = false
+                
                 default:
                     print($0.keyCode)
                     return $0
@@ -93,11 +98,13 @@ class ViewController: NSViewController {
     @objc func passLogic() {
         guard let locWindow = self.view.window,
             NSApplication.shared.keyWindow === locWindow else { logic.gameTick(renderer: renderer!); return }
+        
         if(NSEvent.modifierFlags.contains(NSEvent.ModifierFlags.shift)) {
             self.logic.shiftDown = true
         }else {
             self.logic.shiftDown = false
         }
+        
         logic.gameTick(renderer: renderer!)
     }
     

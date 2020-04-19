@@ -18,7 +18,7 @@ struct Eye {
     var pos: SIMD3<Float>
 }
 
-struct float8 {
+struct Vertex {
     var pos: SIMD4<Float>
     var color: SIMD4<Float>
 }
