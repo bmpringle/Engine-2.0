@@ -52,7 +52,7 @@ class Logic {
         }
         
         //check for collision with ground.
-        for i in objects {
+        for object in objects {
             for k in 0..<4 {
                 var PMOD = SIMD3<Float>(0, 0, 0)
                 switch(k) {
@@ -65,24 +65,25 @@ class Logic {
                     default:
                         PMOD = SIMD3<Float>(1, 0, 1)
                 }
-                for j in 0..<i.getVertices().count/3 {
-                    let A = i.getVertices()[3*j]
-                    let B = i.getVertices()[3*j+1]
-                    let C = i.getVertices()[3*j+2]
+                for t in 0..<object.getVertices().count/3 {
+                    let v0 = object.getVertices()[3*t]
+                    let v1 = object.getVertices()[3*t+1]
+                    let v2 = object.getVertices()[3*t+2]
                     let P = player.xyz + PMOD
                     
-                    if(pointInTriangle(pt: SIMD2<Float>(P[0], P[2]), v1: SIMD2<Float>(A.pos[0], A.pos[2]), v2: SIMD2<Float>(B.pos[0], B.pos[2]), v3: SIMD2<Float>(C.pos[0], C.pos[2]))) {
+                    if(pointInTriangle(pt: SIMD2<Float>(P[0], P[2]), v1: SIMD2<Float>(v0.pos[0], v0.pos[2]),
+                                       v2: SIMD2<Float>(v1.pos[0], v1.pos[2]), v3: SIMD2<Float>(v2.pos[0], v2.pos[2]))) {
                         
-                        let BA = SIMD3<Float>((B.pos-A.pos)[0], (B.pos-A.pos)[1], (B.pos-A.pos)[2])
-                        let CA = SIMD3<Float>((C.pos-A.pos)[0], (C.pos-A.pos)[1], (C.pos-A.pos)[2])
+                        let v1v0 = SIMD3<Float>((v1.pos-v0.pos)[0], (v1.pos-v0.pos)[1], (v1.pos-v0.pos)[2])
+                        let v2v0 = SIMD3<Float>((v2.pos-v0.pos)[0], (v2.pos-v0.pos)[1], (v2.pos-v0.pos)[2])
                         
-                        let normalV = crossProduct(a: BA, b: CA)
+                        let normalV = crossProduct(a: v1v0, b: v2v0)
                         
                         //equation of the plane is ax+by+cz=d
                         let a = normalV[0]
                         let b = normalV[1]
                         let c = normalV[2]
-                        let d = a*A.pos[0]+b*A.pos[1]+c*A.pos[2]
+                        let d = a*v0.pos[0]+b*v0.pos[1]+c*v0.pos[2]
                          
                         let lineX = player.xyz[0]
                         let lineZ = player.xyz[2]
