@@ -25,10 +25,12 @@ class Logic {
     var maxSpeed: Float = 3
     
     init() {
-        player = Player(vertices: Object.objToObject(path: "player", color: SIMD4<Float>(1, 0, 0, 1)), name: "player", thirdperson: true)
-        player.move(xyz: SIMD3<Float>(3, 1, 0))
+        player = Player(vertices: Object.objToObject(path: "player", color: SIMD4<Float>(1, 0.5, 1, 1)), name: "player", thirdperson: true)
+        player.move(xyz: SIMD3<Float>(0, 3, 0))
         objects.append(Object(vertices: Renderer.verts, name: "boxocolors"))
-        objects[0].move(xyz: SIMD3<Float>(3, 0, 0))
+        objects[0].move(xyz: SIMD3<Float>(0, 0, 0))
+        objects.append(Object(vertices: Renderer.verts, name: "boxocolors2"))
+        objects[1].move(xyz: SIMD3<Float>(4, 0, 6))
     }
     
     func gameTick(renderer: Renderer) {
@@ -49,7 +51,7 @@ class Logic {
             falling = false
         }
         
-        //check for collision with ground. Currently only implemented on x and z axis, working on y axis
+        //check for collision with ground.
         for i in objects {
             for k in 0..<4 {
                 var PMOD = SIMD3<Float>(0, 0, 0)
@@ -70,14 +72,33 @@ class Logic {
                     let P = player.xyz + PMOD
                     
                     if(pointInTriangle(pt: SIMD2<Float>(P[0], P[2]), v1: SIMD2<Float>(A.pos[0], A.pos[2]), v2: SIMD2<Float>(B.pos[0], B.pos[2]), v3: SIMD2<Float>(C.pos[0], C.pos[2]))) {
-                        falling = false
+                        
+                        let BA = SIMD3<Float>((B.pos-A.pos)[0], (B.pos-A.pos)[1], (B.pos-A.pos)[2])
+                        let CA = SIMD3<Float>((C.pos-A.pos)[0], (C.pos-A.pos)[1], (C.pos-A.pos)[2])
+                        
+                        let normalV = crossProduct(a: BA, b: CA)
+                        
+                        //equation of the plane is ax+by+cz=d
+                        let a = normalV[0]
+                        let b = normalV[1]
+                        let c = normalV[2]
+                        let d = a*A.pos[0]+b*A.pos[1]+c*A.pos[2]
+                         
+                        let lineX = player.xyz[0]
+                        let lineZ = player.xyz[2]
+                        
+                        let lineY = (d-a*lineX-c*lineZ)/b
+                        
+                        if((player.xyz[1]+(velocity[1]-Float(GPS/60)) < lineY) && player.xyz[1] >= lineY) {
+                            player.xyz[1] = lineY
+                            falling = false
+                        }else {
+    
+                        }
                     }
-                    
-                    
                 }
             }
         }
-        
         //handle falling
         if(!falling) {
             velocity[1] = 0
@@ -141,5 +162,11 @@ class Logic {
 
         return !(has_neg && has_pos);
     }
-
+    
+    func crossProduct(a:  SIMD3<Float>, b: SIMD3<Float>) -> SIMD3<Float> {
+        let x: Float = a[1]*b[2]-a[2]*b[1]
+        let y: Float = a[2]*b[0]-a[0]*b[2]
+        let z: Float = a[0]*b[1]-a[1]*b[0]
+        return SIMD3<Float>(x, y, z)
+    }
 }

@@ -13,7 +13,7 @@ class Player: Object {
     
     init(vertices: [Vertex]?, name: String, thirdperson: Bool) {
         if(thirdperson) {
-            eye.pos+=SIMD3<Float>(-4, 5, -15)
+            eye.pos+=SIMD3<Float>(4, 6, -15)
         }
         super.init(vertices: vertices, name: name)
     }
